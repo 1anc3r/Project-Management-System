@@ -49,6 +49,23 @@
         </div>
       </div>
 
+      <vue-office-docx
+        v-else-if="previewType === 'docx' && previewData"
+        :src="previewData"
+        style="height: auto;"
+      />
+      <vue-office-excel
+        v-else-if="previewType === 'xlsx' && previewData"
+        :src="previewData"
+        :options="{ xls: true }"
+        style="height: auto;"
+      />
+      <vue-office-pptx
+        v-else-if="previewType === 'pptx' && previewData"
+        :src="previewData"
+        style="height: auto;"
+      />
+
       <!-- Office 文档预览 -->
       <div v-else-if="previewType === 'office'" class="preview-office">
         <div v-if="officePreviewUrl" class="office-iframe-wrapper">
@@ -95,6 +112,12 @@ import {
 } from '@element-plus/icons-vue'
 import { getPreviewType, getFileViewBlob, getFileContent, downloadAttachment } from '@/api/attachments'
 import { formatFileSize, downloadBlob } from '@/utils/format'
+import VueOfficeDocx from '@vue-office/docx'
+// import '@vue-office/docx/lib/index.css'
+import VueOfficeExcel from '@vue-office/excel'
+// import '@vue-office/excel/lib/index.css'
+import VueOfficePptx from '@vue-office/pptx'
+// import '@vue-office/pptx/lib/index.css'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -137,6 +160,9 @@ const fileExtension = computed(() => {
   return dotIndex > -1 ? name.slice(dotIndex) : ''
 })
 
+// 预览数据（Office 文档直接传给组件）
+const previewData = ref(null)
+
 // 模板中图片与 PDF 统一使用 Blob 对象 URL
 const previewUrl = computed(() => previewObjectUrl.value)
 
@@ -169,9 +195,17 @@ const fetchPreviewBlob = async () => {
   loading.value = true
   try {
     const response = await getFileViewBlob(props.attachment.id)
-    previewObjectUrl.value = URL.createObjectURL(response.data)
+
+    if (previewType.value === 'image' || previewType.value === 'pdf') {
+      // 图片/PDF 走 blob URL
+      previewObjectUrl.value = URL.createObjectURL(response.data)
+    } else {
+      // Office 文档：直接保存 Blob，传给组件
+      previewData.value = response.data
+    }
   } catch (error) {
     console.error('获取文件预览失败:', error)
+    ElMessage.error('获取文件预览失败')
   } finally {
     loading.value = false
   }
@@ -183,6 +217,7 @@ const revokePreviewUrl = () => {
     URL.revokeObjectURL(previewObjectUrl.value)
     previewObjectUrl.value = ''
   }
+  previewData.value = null
 }
 
 // 设置 Office 预览 URL
@@ -201,6 +236,7 @@ const downloadFile = async () => {
     downloadBlob(response.data, fileName.value || 'download')
   } catch (error) {
     console.error('下载文件失败:', error)
+    ElMessage.error('下载文件失败')
   }
 }
 
@@ -225,6 +261,8 @@ const loadPreview = () => {
     fetchPreviewBlob()
   } else if (previewType.value === 'office') {
     setupOfficePreview()
+  } else if (previewType.value === 'docx' || previewType.value === 'xlsx' || previewType.value === 'pptx') {
+    fetchPreviewBlob()
   }
 }
 

@@ -89,7 +89,9 @@ export const getPreviewType = (filename) => {
     image: ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'],
     pdf: ['.pdf'],
     text: ['.txt', '.csv', '.json', '.md', '.log', '.xml', '.css', '.js', '.html', '.htm', '.yaml', '.yml', '.sql'],
-    office: ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']
+    docx: ['.doc', '.docx'],
+    xlsx: ['.xls', '.xlsx'],
+    pptx: ['.ppt', '.pptx']
   }
   for (const [type, exts] of Object.entries(previewMap)) {
     if (exts.includes(ext)) return type

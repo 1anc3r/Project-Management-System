@@ -462,12 +462,20 @@ const previewFile = async (req, res) => {
       contentType = 'application/pdf';
     } else if (previewType === 'text') {
       contentType = TEXT_MIME_TYPES[ext] || 'text/plain; charset=utf-8';
-    } else if (previewType === 'office') {
+    } else if (previewType === 'docx') {
       const officeMimeTypes = {
         '.doc': 'application/msword',
         '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      };
+      contentType = officeMimeTypes[ext] || 'application/octet-stream';
+    } else if (previewType === 'xlsx') {
+      const officeMimeTypes = {
         '.xls': 'application/vnd.ms-excel',
         '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      };
+      contentType = officeMimeTypes[ext] || 'application/octet-stream';
+    } else if (previewType === 'pptx') {
+      const officeMimeTypes = {
         '.ppt': 'application/vnd.ms-powerpoint',
         '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
       };
@@ -479,7 +487,9 @@ const previewFile = async (req, res) => {
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(attachment.file_name)}"`);
 
     // 发送文件
-    res.sendFile(path.resolve(filePath));
+    // res.sendFile(path.resolve(filePath));
+    const stream = fs.createReadStream(path.resolve(filePath));
+    stream.pipe(res);
   } catch (error) {
     console.error('文件预览错误:', error);
     res.status(500).json({
