@@ -220,7 +220,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'Dashboard' })
+import { ref, onMounted, onActivated, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -239,6 +241,8 @@ import { Folder, Money, DocumentChecked, Document, User } from '@element-plus/ic
 import { getProjectStats } from '@/api/projects'
 import { getAllInformation, getInformationStats } from '@/api/information'
 import { formatAmount, formatDate, getInfoTypeTag, getProjectStageColor, getProjectTypeColor } from '@/utils/format'
+// ECharts tooltip 默认 renderMode: 'html'，formatter 返回值按 HTML 渲染，需转义动态文案
+import { escapeHtml } from '@/utils/sanitize'
 import TiandituMap from './components/TiandituMap.vue'
 
 // 注册 ECharts 组件
@@ -310,7 +314,7 @@ const projStageChartOption = computed(() => ({
   tooltip: {
     trigger: 'item',
     formatter: (params) => {
-      return `${params.name}<br/>项目数: ${params.value} 个<br/>金额: ${formatAmount(params.data.amount)} 万元`
+      return `${escapeHtml(params.name)}<br/>项目数: ${escapeHtml(params.value)} 个<br/>金额: ${escapeHtml(formatAmount(params.data.amount))} 万元`
     }
   },
   legend: {
@@ -331,7 +335,7 @@ const projStageChartOption = computed(() => ({
       label: {
         show: true,
         formatter: (params) => {
-          return `${params.name}\n${params.value}个\n${formatAmount(params.data.amount)}万`
+          return `${escapeHtml(params.name)}\n${escapeHtml(params.value)}个\n${escapeHtml(formatAmount(params.data.amount))}万`
         }
       },
       emphasis: {
@@ -360,7 +364,7 @@ const projTrendChartOption = computed(() => ({
     },
     formatter: (params) => {
       const data = params[0]
-      return `${data.name}<br/>合同金额: ${formatAmount(data.value)} 万元`
+      return `${escapeHtml(data.name)}<br/>合同金额: ${escapeHtml(formatAmount(data.value))} 万元`
     }
   },
   grid: {
@@ -419,7 +423,7 @@ const projTypeChartOption = computed(() => ({
   tooltip: {
     trigger: 'item',
     formatter: (params) => {
-      return `${params.name}<br/>项目数: ${params.value} 个<br/>金额: ${formatAmount(params.data.amount)} 万元`
+      return `${escapeHtml(params.name)}<br/>项目数: ${escapeHtml(params.value)} 个<br/>金额: ${escapeHtml(formatAmount(params.data.amount))} 万元`
     }
   },
   legend: {
@@ -440,7 +444,7 @@ const projTypeChartOption = computed(() => ({
       label: {
         show: true,
         formatter: (params) => {
-          return `${params.name}\n${params.value}个\n${formatAmount(params.data.amount)}万`
+          return `${escapeHtml(params.name)}\n${escapeHtml(params.value)}个\n${escapeHtml(formatAmount(params.data.amount))}万`
         }
       },
       emphasis: {
@@ -465,7 +469,7 @@ const infoTypeChartOption = computed(() => ({
   tooltip: {
     trigger: 'item',
     formatter: (params) => {
-      return `${params.name}<br/>数量: ${params.value} 条<br/>占比: ${params.percent}%`
+      return `${escapeHtml(params.name)}<br/>数量: ${escapeHtml(params.value)} 条<br/>占比: ${escapeHtml(params.percent)}%`
     }
   },
   legend: {
@@ -588,7 +592,7 @@ const infoRankingChartOption = computed(() => {
       axisPointer: { type: 'shadow' },
       formatter: (params) => {
         const p = params[0]
-        return `${p.name}<br/>资讯数量: ${p.value} 条`
+        return `${escapeHtml(p.name)}<br/>资讯数量: ${escapeHtml(p.value)} 条`
       }
     },
     grid: {
@@ -687,6 +691,13 @@ const handleProjTypeClick = (params) => {
 }
 
 onMounted(() => {
+  fetchProjStats()
+  fetchInfoStats()
+  fetchInformationList()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新统计
+onActivated(() => {
   fetchProjStats()
   fetchInfoStats()
   fetchInformationList()

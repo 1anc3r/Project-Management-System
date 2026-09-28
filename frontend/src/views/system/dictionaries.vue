@@ -116,7 +116,7 @@
           <el-input v-model="dictForm.description" type="textarea" placeholder="请输入字典描述" />
         </el-form-item>
         <el-form-item label="排序" prop="sort_order">
-          <el-input-number v-model="dictForm.sort_order" :min="0" style="width: 100%" />
+          <el-input-number v-model="dictForm.sort_order" value-on-clear="min" :precision="0" :min="0" style="width: 100%" />
         </el-form-item>
 
         <!-- 字典项列表 -->
@@ -144,7 +144,7 @@
             </el-table-column>
             <el-table-column label="排序" width="80">
               <template #default="{ row, $index }">
-                <el-input-number v-model="row.sort_order" size="small" :min="0" style="width: 100%" />
+                <el-input-number v-model="row.sort_order" value-on-clear="min" :precision="0" size="small" :min="0" style="width: 100%" />
               </template>
             </el-table-column>
             <el-table-column label="操作" width="80" align="center">
@@ -177,7 +177,7 @@
           <el-input v-model="itemForm.item_value" placeholder="请输入字典项值（可选，默认与名称相同）" />
         </el-form-item>
         <el-form-item label="排序" prop="sort_order">
-          <el-input-number v-model="itemForm.sort_order" :min="0" style="width: 100%" />
+          <el-input-number v-model="itemForm.sort_order" value-on-clear="min" :precision="0" :min="0" style="width: 100%" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="itemForm.remark" type="textarea" placeholder="请输入备注" />
@@ -200,7 +200,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'DictionaryManagement' })
+import { ref, reactive, onMounted, onActivated } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
 import {
@@ -340,7 +342,11 @@ const handleEdit = (row) => {
 
 // 提交字典
 const handleSubmitDict = async () => {
-  await dictFormRef.value.validate()
+  try {
+    await dictFormRef.value.validate()
+  } catch {
+    return   // 校验失败：表单已展示行内错误，静默返回
+  }
 
   submitLoading.value = true
   try {
@@ -395,16 +401,23 @@ const handleToggleStatus = async (row) => {
 }
 
 // 删除字典
-const handleDelete = (row) => {
-  ElMessageBox.confirm(`确定要删除字典 "${row.dict_name}" 吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除字典 "${row.dict_name}" 吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+  } catch {
+    return   // 用户取消：静默返回，避免未捕获的 Promise 拒绝
+  }
+  try {
     await deleteDictionary(row.id)
     ElMessage.success('删除成功')
     fetchData()
-  })
+  } catch (error) {
+    console.error('删除失败:', error)   // 错误提示已由 request.js 拦截器统一弹出
+  }
 }
 
 // 添加字典项
@@ -440,7 +453,11 @@ const handleEditItem = (dict, item) => {
 
 // 提交字典项
 const handleSubmitItem = async () => {
-  await itemFormRef.value.validate()
+  try {
+    await itemFormRef.value.validate()
+  } catch {
+    return   // 校验失败：表单已展示行内错误，静默返回
+  }
 
   itemSubmitLoading.value = true
   try {
@@ -468,19 +485,31 @@ const handleItemClose = () => {
 }
 
 // 删除字典项
-const handleDeleteItem = (dict, item) => {
-  ElMessageBox.confirm(`确定要删除字典项 "${item.item_name}" 吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
+const handleDeleteItem = async (dict, item) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除字典项 "${item.item_name}" 吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+  } catch {
+    return   // 用户取消：静默返回，避免未捕获的 Promise 拒绝
+  }
+  try {
     await deleteDictionaryItem(dict.id, item.id)
     ElMessage.success('删除成功')
     fetchData()
-  })
+  } catch (error) {
+    console.error('删除失败:', error)   // 错误提示已由 request.js 拦截器统一弹出
+  }
 }
 
 onMounted(() => {
+  fetchData()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新数据
+onActivated(() => {
   fetchData()
 })
 </script>

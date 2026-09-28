@@ -1,17 +1,12 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <keep-alive :include="cachedViews">
-      <component :is="Component" />
-    </keep-alive>
-  </router-view>
+  <router-view />
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useTabStore } from '@/stores/tabs'
-
-const tabStore = useTabStore()
-const cachedViews = computed(() => tabStore.cachedViews)
+// 说明：App 层不再套 keep-alive。
+// 此处渲染的是布局组件 MainLayout，其组件名与 cachedViews 中的业务路由名永不匹配，
+// 该层缓存实际不生效；且一旦 cachedViews 出现 "MainLayout"，会把整个布局缓存下来，
+// 与 MainLayout 内部基于标签页的缓存冲突。页面缓存统一由 MainLayout 的 router-view 负责。
 </script>
 
 <style>

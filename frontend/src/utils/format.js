@@ -227,9 +227,11 @@ export const downloadBlob = (blob, filename) => {
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = filename
+  // 清洗文件名中的非法字符，避免部分环境下载名异常
+  link.download = String(filename || 'download').replace(/[\\/:*?"<>|\r\n\t]/g, '_')
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  window.URL.revokeObjectURL(url)
+  // 立即 revoke 会导致部分浏览器（Firefox/Safari）中断下载，延迟释放
+  setTimeout(() => window.URL.revokeObjectURL(url), 1000)
 }

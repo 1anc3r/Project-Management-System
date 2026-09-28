@@ -7,6 +7,9 @@ import { useUserStore } from '@/stores/user'
 const handleUnauthorized = async () => {
   const userStore = useUserStore()
   userStore.logout()
+  // 同步复位标签页与组件缓存，避免重新登录后残留上一会话的页面与缓存实例
+  const { useTabStore } = await import('@/stores/tabs')
+  useTabStore().reset()
   const { default: router } = await import('@/router')
   const currentPath = router.currentRoute.value.fullPath
   if (currentPath !== '/login') {

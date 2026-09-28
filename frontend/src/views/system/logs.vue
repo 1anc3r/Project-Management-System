@@ -52,7 +52,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'LogManagement' })
+import { ref, reactive, onMounted, onActivated } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search, Download } from '@element-plus/icons-vue'
 import { getLogs, exportLogs, getLogFilterOptions } from '@/api/logs'
@@ -166,6 +168,11 @@ const handleExport = async () => {
 onMounted(() => {
   fetchData()
   fetchFilterOptions()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新数据
+onActivated(() => {
+  fetchData()
 })
 </script>
 

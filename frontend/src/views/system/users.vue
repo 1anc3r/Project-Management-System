@@ -124,7 +124,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'UserManagement' })
+import { ref, reactive, onMounted, onActivated } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
 import { getUsers, createUser, updateUser, deleteUser, resetPassword, getRoles } from '@/api/users'
@@ -279,7 +281,11 @@ const handleEdit = (row) => {
 
 // 提交表单
 const handleSubmit = async () => {
-  await formRef.value.validate()
+  try {
+    await formRef.value.validate()
+  } catch {
+    return   // 校验失败：表单已展示行内错误，静默返回
+  }
 
   submitLoading.value = true
   try {
@@ -325,16 +331,23 @@ const handleToggleStatus = async (row) => {
 }
 
 // 删除
-const handleDelete = (row) => {
-  ElMessageBox.confirm(`确定要删除用户 "${row.username}" 吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定要删除用户 "${row.username}" 吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+  } catch {
+    return   // 用户取消：静默返回，避免未捕获的 Promise 拒绝
+  }
+  try {
     await deleteUser(row.id)
     ElMessage.success('删除成功')
     fetchData()
-  })
+  } catch (error) {
+    console.error('删除失败:', error)   // 错误提示已由 request.js 拦截器统一弹出
+  }
 }
 
 // 重置密码
@@ -367,6 +380,11 @@ const handleSubmitPassword = async () => {
 onMounted(() => {
   fetchData()
   fetchRoles()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新数据
+onActivated(() => {
+  fetchData()
 })
 </script>
 

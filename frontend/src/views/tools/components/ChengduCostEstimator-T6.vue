@@ -27,7 +27,7 @@
               <el-input v-model="projectName" />
             </el-form-item>
             <el-form-item label="规模变更因子 (CF)">
-              <el-input-number v-model="cf" :min="1" :max="2" :step="0.01" controls-position="right" style="width:100%;" />
+              <el-input-number v-model="cf" :min="1" :max="2" :step="0.01" value-on-clear="min" :precision="2" controls-position="right" style="width:100%;" />
               <div class="def-text">已交付项目通常取 1，未确定项目可调整（1~2）</div>
             </el-form-item>
           </el-form>
@@ -45,12 +45,12 @@
           <el-row :gutter="12">
             <el-col :xs="12" :sm="12">
               <el-form-item label="ILF 数量">
-                <el-input-number v-model="ilf" :min="0" :step="1" controls-position="right" style="width:100%;" />
+                <el-input-number v-model="ilf" :min="0" :step="1" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" />
               </el-form-item>
             </el-col>
             <el-col :xs="12" :sm="12">
               <el-form-item label="EIF 数量">
-                <el-input-number v-model="eif" :min="0" :step="1" controls-position="right" style="width:100%;" />
+                <el-input-number v-model="eif" :min="0" :step="1" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -165,12 +165,12 @@
           </template>
           <el-form label-position="top" size="default">
             <el-row :gutter="12">
-              <el-col :xs="12" :sm="12"><el-form-item label="办公费"><el-input-number v-model="dncOffice" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
-              <el-col :xs="12" :sm="12"><el-form-item label="差旅费"><el-input-number v-model="dncTravel" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
-              <el-col :xs="12" :sm="12"><el-form-item label="培训费"><el-input-number v-model="dncTrain" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
-              <el-col :xs="12" :sm="12"><el-form-item label="业务费"><el-input-number v-model="dncBiz" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
-              <el-col :xs="12" :sm="12"><el-form-item label="采购费"><el-input-number v-model="dncProcure" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
-              <el-col :xs="12" :sm="12"><el-form-item label="其他"><el-input-number v-model="dncOther" :min="0" :step="1000" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="办公费"><el-input-number v-model="dncOffice" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="差旅费"><el-input-number v-model="dncTravel" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="培训费"><el-input-number v-model="dncTrain" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="业务费"><el-input-number v-model="dncBiz" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="采购费"><el-input-number v-model="dncProcure" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
+              <el-col :xs="12" :sm="12"><el-form-item label="其他"><el-input-number v-model="dncOther" :min="0" :step="1000" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" /></el-form-item></el-col>
             </el-row>
             <div class="formula-text">
               <span><strong>DNC</strong> = <span class="high-light-text">{{ dncTotal }} 元</span></span>
@@ -187,12 +187,12 @@
             <el-row :gutter="12">
               <el-col :xs="12" :sm="12">
                 <el-form-item label="平均人力成本费率 F (元/人月)">
-                  <el-input-number v-model="rateF" :min="0" :step="100" controls-position="right" style="width:100%;" />
+                  <el-input-number v-model="rateF" :min="0" :step="100" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" />
                 </el-form-item>
               </el-col>
               <el-col :xs="12" :sm="12">
                 <el-form-item label="人月折算系数 HM (人时/人月)">
-                  <el-input-number v-model="hm" :min="1" :step="1" controls-position="right" style="width:100%;" />
+                  <el-input-number v-model="hm" :min="1" :step="1" value-on-clear="min" :precision="0" controls-position="right" style="width:100%;" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -254,7 +254,7 @@
             </div>
           </div>
           <div style="margin-top:8px;text-align:right;font-size:13px;color:#8a9aa8;">
-            运维功能点单价 ≈ {{ (pMost / s).toFixed(0) }} 元/FP &nbsp;|&nbsp; DNC = {{ dncTotal.toFixed(0) }} 元
+            运维功能点单价 ≈ {{ unitPricePerFP === null ? '—' : unitPricePerFP.toFixed(0) }} 元/FP &nbsp;|&nbsp; DNC = {{ dncTotal.toFixed(0) }} 元
           </div>
         </el-card>
 
@@ -364,9 +364,19 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+// CSV 导出统一转义并阻断公式注入
+import { buildCsv, safeFileName } from '../utils/csv'
+
+// 输入框被清空时 el-input-number 可能给出 null/''，统一归一为数字并兜底默认值
+const toNum = (v, fallback = 0) => {
+  if (v === null || v === undefined || v === '') return fallback
+  const n = Number(v)
+  return Number.isFinite(n) ? n : fallback
+}
 
 export default {
-  name: 'ChengduMaintenanceCostEstimator',
+  // 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+  name: 'ChengduCostEstimator-T6',
   setup() {
     const headerRef = ref(null)
     const exportRef = ref(null)
@@ -406,27 +416,45 @@ export default {
     const hm = ref(176)
 
     // --- 计算属性 ---
-    const ufp = computed(() => 35 * ilf.value + 15 * eif.value)
-    const s = computed(() => ufp.value * cf.value)
+    const ufp = computed(() => 35 * toNum(ilf.value) + 15 * toNum(eif.value))
+    const s = computed(() => ufp.value * toNum(cf.value, 1))
 
-    const mlf = computed(() => updateFreq.value * supportMode.value)
-    const mcf = computed(() => teamExp.value)
-    const msf = computed(() => deploy.value * novelty.value * userScale.value * sysRelation.value * bizUnits.value)
+    const mlf = computed(() => toNum(updateFreq.value, 0.95) * toNum(supportMode.value, 1))
+    const mcf = computed(() => toNum(teamExp.value, 1))
+    const msf = computed(() => toNum(deploy.value, 1) * toNum(novelty.value, 1) * toNum(userScale.value, 1) * toNum(sysRelation.value, 1.14) * toNum(bizUnits.value, 1))
 
     const PDR_P25 = 3.02
     const PDR_P50 = 6.56
     const PDR_P75 = 11.42
 
-    const aeLower = computed(() => s.value * PDR_P25 * mlf.value * mcf.value * msf.value)
-    const aeMost = computed(() => s.value * PDR_P50 * mlf.value * mcf.value * msf.value)
-    const aeUpper = computed(() => s.value * PDR_P75 * mlf.value * mcf.value * msf.value)
+    const aeLower = computed(() => toNum(s.value) * PDR_P25 * toNum(mlf.value) * toNum(mcf.value) * toNum(msf.value))
+    const aeMost = computed(() => toNum(s.value) * PDR_P50 * toNum(mlf.value) * toNum(mcf.value) * toNum(msf.value))
+    const aeUpper = computed(() => toNum(s.value) * PDR_P75 * toNum(mlf.value) * toNum(mcf.value) * toNum(msf.value))
 
-    const dncTotal = computed(() => dncOffice.value + dncTravel.value + dncTrain.value +
-      dncBiz.value + dncProcure.value + dncOther.value)
+    const dncTotal = computed(() => toNum(dncOffice.value) + toNum(dncTravel.value) + toNum(dncTrain.value) +
+      toNum(dncBiz.value) + toNum(dncProcure.value) + toNum(dncOther.value))
 
-    const pLower = computed(() => (aeLower.value / hm.value) * rateF.value + dncTotal.value)
-    const pMost = computed(() => (aeMost.value / hm.value) * rateF.value + dncTotal.value)
-    const pUpper = computed(() => (aeUpper.value / hm.value) * rateF.value + dncTotal.value)
+    const pLower = computed(() => {
+      const hmVal = toNum(hm.value, 176)
+      if (hmVal <= 0) return 0
+      return (toNum(aeLower.value) / hmVal) * toNum(rateF.value, 16900) + dncTotal.value
+    })
+    const pMost = computed(() => {
+      const hmVal = toNum(hm.value, 176)
+      if (hmVal <= 0) return 0
+      return (toNum(aeMost.value) / hmVal) * toNum(rateF.value, 16900) + dncTotal.value
+    })
+    const pUpper = computed(() => {
+      const hmVal = toNum(hm.value, 176)
+      if (hmVal <= 0) return 0
+      return (toNum(aeUpper.value) / hmVal) * toNum(rateF.value, 16900) + dncTotal.value
+    })
+
+    // 运维功能点单价：规模 S 为 0（清空 ILF/EIF）时不可计算，用 null 表示，避免展示 Infinity/NaN
+    const unitPricePerFP = computed(() => {
+      const scale = toNum(s.value)
+      return scale > 0 ? pMost.value / scale : null
+    })
 
     // --- 方法 ---
     function loadExample() {
@@ -502,18 +530,20 @@ export default {
         ['DNC 合计 (元)', dncTotal.value],
         ['平均人力成本费率 F (元/人月)', rateF.value],
         ['人月折算系数 HM', hm.value],
-        ['功能点单价 (元/FP)', (pMost.value / s.value).toFixed(2)],
+        ['功能点单价 (元/FP)', unitPricePerFP.value === null ? '' : unitPricePerFP.value.toFixed(2)],
       ]
-      let csv = '\uFEFF'
-      rows.forEach(row => { csv += row.join(',') + '\n' })
+      // 统一走 buildCsv：转义逗号/引号/换行，并阻断 = + - @ 开头的公式注入（CWE-1236）
+      const csv = buildCsv(rows)
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = `运维费用测算表_${projectName.value || '项目'}.csv`
+      const url = URL.createObjectURL(blob)
+      link.href = url
+      link.setAttribute('download', `运维费用测算表_${safeFileName(projectName.value, '项目')}.csv`)
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      URL.revokeObjectURL(link.href)
+      // 立即 revoke 会导致部分浏览器中断下载，延迟释放
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
     }
 
     async function exportPDF() {
@@ -626,6 +656,7 @@ export default {
       pLower,
       pMost,
       pUpper,
+      unitPricePerFP,
       loadExample,
       resetAll,
       exportCSV,

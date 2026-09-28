@@ -10,6 +10,7 @@ const path = require('path');
 const { convertToCSV, parseCSV } = require('../utils/csvHelper');
 const { getDictItems } = require('../utils/dictHelper');
 const { parsePage, MAX_EXPORT_ROWS } = require('../utils/pagination');
+const { sanitizeRichText } = require('../utils/htmlSanitizer');
 
 /**
  * 去除HTML标签，获取纯文本
@@ -302,6 +303,9 @@ const createKnowledge = async (req, res) => {
       }
     }
 
+    // 净化富文本：移除脚本、事件处理器与危险协议，防止存储型 XSS
+    const cleanAnswer = sanitizeRichText(answer);
+
     const result = await transaction(async (connection) => {
       // 创建知识条目
       const [insertResult] = await connection.execute(
@@ -310,7 +314,7 @@ const createKnowledge = async (req, res) => {
          VALUES (?, ?, ?, ?, ?)`,
         [
           question.trim(),
-          answer,
+          cleanAnswer,
           category,
           tagsStr || null,
           req.user.userId
@@ -425,6 +429,9 @@ const updateKnowledge = async (req, res) => {
       }
     }
 
+    // 净化富文本：移除脚本、事件处理器与危险协议，防止存储型 XSS
+    const cleanAnswer = sanitizeRichText(answer);
+
     await transaction(async (connection) => {
       // 更新知识条目
       await connection.execute(
@@ -433,7 +440,7 @@ const updateKnowledge = async (req, res) => {
          WHERE id = ?`,
         [
           question.trim(),
-          answer,
+          cleanAnswer,
           category,
           tagsStr || null,
           id
@@ -809,7 +816,8 @@ const importKnowledge = async (req, res) => {
              VALUES (?, ?, ?, ?, ?)`,
             [
               question.trim(),
-              answer,
+              // 导入是最容易绕过编辑器的入口，必须同样净化
+              sanitizeRichText(answer),
               category,
               tagsStr || null,
               req.user.userId

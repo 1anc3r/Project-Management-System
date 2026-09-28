@@ -3,19 +3,17 @@
  * 验证用户身份和权限
  *
  * 安全说明：
- * 1. 生产环境必须配置 JWT_SECRET，缺失时启动即失败，杜绝硬编码密钥伪造 Token
+ * 1. 生产环境必须配置 JWT_SECRET，且不得与 DB_PASSWORD 复用；缺失或复用时启动即失败，
+ *    杜绝硬编码密钥与口令复用导致的 Token 伪造（见 config/security.js）
  * 2. 文件访问（预览/下载/静态资源）使用独立的短期作用域凭证 access_token，
  *    不再支持在 URL 中传递登录 JWT，避免凭证进入 Nginx 日志、浏览器历史与 Referer
  */
 const jwt = require('jsonwebtoken');
 const { query } = require('../config/db');
+const { resolveJwtSecret } = require('../config/security');
 
-// JWT密钥：生产环境未配置时直接抛错，启动失败
-const JWT_SECRET = process.env.JWT_SECRET || (
-  process.env.NODE_ENV === 'production'
-    ? (() => { throw new Error('生产环境必须配置 JWT_SECRET 环境变量'); })()
-    : 'dev-only-insecure-secret'
-);
+// JWT密钥：生产环境配置不合规时直接抛错，启动失败
+const JWT_SECRET = resolveJwtSecret();
 
 // 文件访问凭证作用域标识
 const FILE_ACCESS_SCOPE = 'file_access';

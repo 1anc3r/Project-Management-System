@@ -59,12 +59,12 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="软件套数">
-                    <el-input-number v-model="cost.software.purchase.count" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.software.purchase.count" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="单价 (万元/套)">
-                    <el-input-number v-model="cost.software.purchase.unitPrice" :min="0" :step="0.5"
+                    <el-input-number v-model="cost.software.purchase.unitPrice" :min="0" :step="0.5" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -85,12 +85,12 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="ILF 数量">
-                    <el-input-number v-model="cost.dev.ilf" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.ilf" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="EIF 数量">
-                    <el-input-number v-model="cost.dev.eif" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.eif" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -107,17 +107,17 @@
               <el-row :gutter="12" v-if="project.phase !== 'feasibility' && project.phase !== 'settlement'">
                 <el-col :span="8">
                   <el-form-item label="EI 数量">
-                    <el-input-number v-model="cost.dev.ei" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.ei" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="EO 数量">
-                    <el-input-number v-model="cost.dev.eo" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.eo" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="EQ 数量">
-                    <el-input-number v-model="cost.dev.eq" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.eq" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -138,7 +138,7 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="非功能因子 NF">
-                    <el-input-number v-model="cost.dev.nf" :min="0.9" :max="1.1" :step="0.025" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.nf" :min="0.9" :max="1.1" :step="0.025" value-on-clear="min" :precision="3" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
@@ -164,17 +164,17 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="人月单价 (万元/人月)">
-                    <el-input-number v-model="cost.dev.rate" :min="0" :step="0.1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.rate" :min="0" :step="0.1" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="人月折算 (人时/人月)">
-                    <el-input-number v-model="cost.dev.hm" :min="1" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.hm" :min="1" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="基准生产率 PDR (P50)">
-                    <el-input-number v-model="cost.dev.pdr" :min="0.1" :step="0.1" style="width:100%;" />
+                    <el-input-number v-model="cost.dev.pdr" :min="0.1" :step="0.1" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -195,24 +195,24 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="数据资源购置 (万元)">
-                    <el-input-number v-model="cost.data.purchase" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.data.purchase" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="数据服务购置 (万元)">
-                    <el-input-number v-model="cost.data.service" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.data.service" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="数据资源建库 (万元)">
-                    <el-input-number v-model="cost.data.build" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.data.build" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="数据加工 (万元)">
-                    <el-input-number v-model="cost.data.process" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.data.process" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -231,18 +231,18 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="集成对象总费用 (万元)">
-                    <el-input-number v-model="cost.integration.base" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.integration.base" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="集成费率 (%)">
-                    <el-input-number v-model="cost.integration.rate" :min="0" :max="10" :step="0.5"
+                    <el-input-number v-model="cost.integration.rate" :min="0" :max="10" :step="0.5" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="调整系数">
-                    <el-input-number v-model="cost.integration.adjust" :min="0.6" :max="1.2" :step="0.1"
+                    <el-input-number v-model="cost.integration.adjust" :min="0.6" :max="1.2" :step="0.1" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -262,12 +262,12 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="编制工作量 (人月)">
-                    <el-input-number v-model="cost.standard.workload" :min="0" :step="0.5" style="width:100%;" />
+                    <el-input-number v-model="cost.standard.workload" :min="0" :step="0.5" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="人月单价 (万元/人月)">
-                    <el-input-number v-model="cost.standard.rate" :min="0" :step="0.1" style="width:100%;" />
+                    <el-input-number v-model="cost.standard.rate" :min="0" :step="0.1" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -286,12 +286,12 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="迁移工作量 (人月)">
-                    <el-input-number v-model="cost.migration.workload" :min="0" :step="0.5" style="width:100%;" />
+                    <el-input-number v-model="cost.migration.workload" :min="0" :step="0.5" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="人月单价 (万元/人月)">
-                    <el-input-number v-model="cost.migration.rate" :min="0" :step="0.1" style="width:100%;" />
+                    <el-input-number v-model="cost.migration.rate" :min="0" :step="0.1" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -323,18 +323,18 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="产品单价 (万元)">
-                    <el-input-number v-model="cost.service.product.unitPrice" :min="0" :step="0.5"
+                    <el-input-number v-model="cost.service.product.unitPrice" :min="0" :step="0.5" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="数量">
-                    <el-input-number v-model="cost.service.product.count" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.service.product.count" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="折旧年限">
-                    <el-input-number v-model="cost.service.product.depreciation" :min="1" :step="1"
+                    <el-input-number v-model="cost.service.product.depreciation" :min="1" :step="1" value-on-clear="min" :precision="0"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -342,7 +342,7 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="服务期 (年)">
-                    <el-input-number v-model="cost.service.product.serviceYears" :min="1" :step="1"
+                    <el-input-number v-model="cost.service.product.serviceYears" :min="1" :step="1" value-on-clear="min" :precision="0"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -361,17 +361,17 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="建设投资 (万元)">
-                    <el-input-number v-model="cost.service.system.investment" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.service.system.investment" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="总运维费 (万元)">
-                    <el-input-number v-model="cost.service.system.maintenance" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.service.system.maintenance" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="经济性系数">
-                    <el-input-number v-model="cost.service.system.economy" :min="0" :max="0.5" :step="0.05"
+                    <el-input-number v-model="cost.service.system.economy" :min="0" :max="0.5" :step="0.05" value-on-clear="min" :precision="2"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -379,19 +379,19 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="投资回报率 i (%)">
-                    <el-input-number v-model="cost.service.system.roi" :min="0" :max="10" :step="0.5"
+                    <el-input-number v-model="cost.service.system.roi" :min="0" :max="10" :step="0.5" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="折现率 c (%)">
-                    <el-input-number v-model="cost.service.system.discount" :min="0" :max="5" :step="0.1"
+                    <el-input-number v-model="cost.service.system.discount" :min="0" :max="5" :step="0.1" value-on-clear="min" :precision="2"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="使用期限 N (年)">
-                    <el-input-number v-model="cost.service.system.term" :min="1" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.service.system.term" :min="1" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -423,34 +423,34 @@
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="机房建设费用 (万元)">
-                    <el-input-number v-model="cost.ops.infrastructure.room" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.ops.infrastructure.room" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="硬件设备购置费 (万元)">
-                    <el-input-number v-model="cost.ops.hardware.purchase" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.ops.hardware.purchase" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="软件产品购置费 (万元)">
-                    <el-input-number v-model="cost.ops.software.purchase" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.ops.software.purchase" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row :gutter="12">
                 <el-col :span="8">
                   <el-form-item label="定制软件开发费 (万元)">
-                    <el-input-number v-model="cost.ops.software.dev" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.ops.software.dev" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="运维费率 (综合 %)">
-                    <el-input-number v-model="cost.ops.rate" :min="0" :max="10" :step="0.5" style="width:100%;" />
+                    <el-input-number v-model="cost.ops.rate" :min="0" :max="10" :step="0.5" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item label="规模调整系数">
-                    <el-input-number v-model="cost.ops.scaleFactor" :min="0.5" :max="1" :step="0.1"
+                    <el-input-number v-model="cost.ops.scaleFactor" :min="0.5" :max="1" :step="0.1" value-on-clear="min" :precision="1"
                       style="width:100%;" />
                   </el-form-item>
                 </el-col>
@@ -477,13 +477,13 @@
               <el-row :gutter="12">
                 <el-col :span="12">
                   <el-form-item label="项目建设其他费用 (万元)">
-                    <el-input-number v-model="cost.other.managementFee" :min="0" :step="1" style="width:100%;" />
+                    <el-input-number v-model="cost.other.managementFee" :min="0" :step="1" value-on-clear="min" :precision="0" style="width:100%;" />
                     <div class="def-text">包括管理费、咨询、监理、测评等</div>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="预备费费率 (%)">
-                    <el-input-number v-model="cost.other.contRate" :min="0" :max="5" :step="0.5" style="width:100%;" />
+                    <el-input-number v-model="cost.other.contRate" :min="0" :max="5" :step="0.5" value-on-clear="min" :precision="1" style="width:100%;" />
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -493,7 +493,7 @@
           <!-- 预备费汇总 -->
           <div class="total-section">
             <div class="total-label">其他费用 & 预备费合计</div>
-            <div class="total-value">{{ (cost.other.managementFee + contingencyCost).toFixed(2) }} 万元</div>
+            <div class="total-value">{{ otherAndContingencyTotal.toFixed(2) }} 万元</div>
           </div>
         </el-card>
 
@@ -527,7 +527,7 @@
             </div>
             <div class="result-item">
               <span class="label">测算阶段</span>
-              <span class="value">{{ project.phaseLabel }}</span>
+              <span class="value">{{ phaseLabel }}</span>
             </div>
             <div class="result-item">
               <span class="label">建设费用</span>
@@ -714,8 +714,12 @@ import {
   Histogram, Download, Management, BrushFilled, GoodsFilled, Tools, MoreFilled,
   Flag, TrendCharts, Warning, Refresh, QuestionFilled
 } from '@element-plus/icons-vue'
+// 金额统一以「整数分」运算，保证「分项之和 === 合计」，且避免 toFixed 对二进制近似值取整出错
+import { toNum, toCents, fromCents, mulCents, rateCents, divCents, sumCents } from '../utils/money'
+import { buildCsv, safeFileName } from '../utils/csv'
 
 export default {
+  // 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
   name: 'SichuanCostEstimator',
   setup() {
     // ---------- ref 引用 ----------
@@ -810,10 +814,10 @@ export default {
       const d = cost.value.dev
       if (phase === 'feasibility' || phase === 'settlement') {
         // 预估法
-        return 35 * d.ilf + 15 * d.eif
+        return 35 * toNum(d.ilf) + 15 * toNum(d.eif)
       } else {
         // 估算法（初设/预算）
-        return 10 * d.ilf + 7 * d.eif + 4 * d.ei + 5 * d.eo + 4 * d.eq
+        return 10 * toNum(d.ilf) + 7 * toNum(d.eif) + 4 * toNum(d.ei) + 5 * toNum(d.eo) + 4 * toNum(d.eq)
       }
     })
 
@@ -829,82 +833,130 @@ export default {
     })
 
     const devS = computed(() => {
-      return devUFP.value * devCF.value * cost.value.dev.reuse
+      // reuse 被清空时若不归一，乘法会静默把整个开发规模变成 0
+      return devUFP.value * devCF.value * toNum(cost.value.dev.reuse, 0.67)
     })
 
     const devSWF = computed(() => {
-      return cost.value.dev.st * cost.value.dev.nf * cost.value.dev.sl * cost.value.dev.dt
+      return toNum(cost.value.dev.st, 1.0) * toNum(cost.value.dev.nf, 1.0) *
+        toNum(cost.value.dev.sl, 1.0) * toNum(cost.value.dev.dt, 0.8)
     })
 
     const devWorkload = computed(() => {
-      return (devS.value * cost.value.dev.pdr * devSWF.value) / cost.value.dev.hm
+      const hm = toNum(cost.value.dev.hm, 174)
+      if (hm <= 0) return 0
+      return (devS.value * toNum(cost.value.dev.pdr, 6.96) * devSWF.value) / hm
     })
 
-    const devCost = computed(() => {
-      return devWorkload.value * cost.value.dev.rate
-    })
+    // ==================== 金额计算（整数分） ====================
+    // 约定：以「整数分」参与运算，仅在展示/导出处转回万元。
+    // 这样可保证「页面展示的分项之和」恰好等于「合计」，且避免 toFixed 对二进制近似值取整出错。
 
-    const softwarePurchaseTotal = computed(() => {
-      return cost.value.software.purchase.count * cost.value.software.purchase.unitPrice
-    })
+    const softwarePurchaseTotalC = computed(() =>
+      mulCents(toCents(cost.value.software.purchase.unitPrice), toNum(cost.value.software.purchase.count)))
 
-    const dataTotal = computed(() => {
+    const devCostC = computed(() =>
+      mulCents(toCents(devWorkload.value), toNum(cost.value.dev.rate)))
+
+    const dataTotalC = computed(() => {
       const d = cost.value.data
-      return d.purchase + d.service + d.build + d.process
+      return sumCents(
+        toCents(d.purchase), toCents(d.service), toCents(d.build), toCents(d.process))
     })
 
-    const integrationCost = computed(() => {
-      return cost.value.integration.base * (cost.value.integration.rate / 100) * cost.value.integration.adjust
+    const integrationCostC = computed(() => {
+      const it = cost.value.integration
+      let cents = rateCents(toCents(it.base), toNum(it.rate, 5))
+      cents = mulCents(cents, toNum(it.adjust, 1))
+      return cents
     })
 
-    const standardCost = computed(() => {
-      return cost.value.standard.workload * cost.value.standard.rate
-    })
+    const standardCostC = computed(() =>
+      mulCents(toCents(cost.value.standard.workload), toNum(cost.value.standard.rate)))
 
-    const migrationCost = computed(() => {
-      return cost.value.migration.workload * cost.value.migration.rate
-    })
+    const migrationCostC = computed(() =>
+      mulCents(toCents(cost.value.migration.workload), toNum(cost.value.migration.rate)))
 
-    const constructionTotal = computed(() => {
-      return softwarePurchaseTotal.value + devCost.value + dataTotal.value +
-        integrationCost.value + standardCost.value + migrationCost.value
-    })
+    // 建设费用合计 = 各分项整数分直接相加（与页面所展示的分项完全自洽）
+    const constructionTotalC = computed(() => sumCents(
+      softwarePurchaseTotalC.value,
+      devCostC.value,
+      dataTotalC.value,
+      integrationCostC.value,
+      standardCostC.value,
+      migrationCostC.value
+    ))
 
-    // 购买信息化产品服务费
-    const productServiceCost = computed(() => {
+    // 购买信息化产品服务费（服务期总额，万元）
+    const productServiceCostC = computed(() => {
       const p = cost.value.service.product
-      return (p.unitPrice * p.count / p.depreciation) * p.serviceYears
+      const dep = toNum(p.depreciation, 5)
+      if (dep <= 0) return 0
+      const annual = divCents(mulCents(toCents(p.unitPrice), toNum(p.count)), dep)
+      return mulCents(annual, toNum(p.serviceYears, 2))
     })
 
-    // 购买信息系统服务费（年均）按标准公式：年均费 = (投资+运维) × 经济性系数 × (1+i) / N × Σ(1+c)^n
-    const systemServiceCost = computed(() => {
+    // 购买信息系统服务费（年均，万元）
+    // 按页面公示公式：年均费 = (投资 + 运维) × 经济性系数 × (1+i) / N × Σ(1+c)^n
+    const systemServiceCostC = computed(() => {
       const s = cost.value.service.system
-      if (s.term <= 0) return 0
-      const base = (s.investment + s.maintenance) * s.economy * (1 + s.roi / 100)
-      return base / s.term
+      const term = toNum(s.term, 5)
+      if (term <= 0) return 0
+      const c = toNum(s.discount) / 100
+      const n = Math.max(1, Math.round(term))
+      let acc = 0
+      for (let k = 1; k <= n; k += 1) acc += Math.pow(1 + c, k)
+      const baseCents = mulCents(
+        sumCents(toCents(s.investment), toCents(s.maintenance)),
+        toNum(s.economy, 0.5)
+      )
+      const withRoi = mulCents(baseCents, 1 + toNum(s.roi, 8) / 100)
+      return Math.round((withRoi / n) * acc)
     })
 
-    const purchaseServiceTotal = computed(() => {
-      return productServiceCost.value + systemServiceCost.value
-    })
+    const purchaseServiceTotalC = computed(() =>
+      sumCents(productServiceCostC.value, systemServiceCostC.value))
 
     // 运维费（IT资产系数法）
-    const opsCost = computed(() => {
+    const opsCostC = computed(() => {
       const ops = cost.value.ops
-      const base = ops.infrastructure.room * 0.04 +
-        ops.hardware.purchase * 0.05 +
-        ops.software.purchase * 0.05 +
-        ops.software.dev * 0.08
-      return base * (ops.rate / 6) * ops.scaleFactor
+      const base = toNum(ops.infrastructure.room) * 0.04 +
+        toNum(ops.hardware.purchase) * 0.05 +
+        toNum(ops.software.purchase) * 0.05 +
+        toNum(ops.software.dev) * 0.08
+      // 先按四舍五入落到分，再继续乘以系数，避免中间浮点误差累积
+      const baseCents = toCents(base)
+      const rated = mulCents(baseCents, toNum(ops.rate, 6) / 6)
+      return mulCents(rated, toNum(ops.scaleFactor, 0.9))
     })
 
-    const contingencyCost = computed(() => {
-      return (constructionTotal.value + cost.value.other.managementFee) * (cost.value.other.contRate / 100)
+    const contingencyCostC = computed(() => {
+      const baseCents = sumCents(constructionTotalC.value, toCents(cost.value.other.managementFee))
+      return rateCents(baseCents, toNum(cost.value.other.contRate, 3))
     })
 
-    const totalInvestment = computed(() => {
-      return constructionTotal.value + cost.value.other.managementFee + contingencyCost.value
-    })
+    const totalInvestmentC = computed(() =>
+      sumCents(constructionTotalC.value, toCents(cost.value.other.managementFee), contingencyCostC.value))
+
+    // 其他费用 + 预备费合计（整数分相加，字段被清空为 null 也不会退化为字符串拼接）
+    const otherAndContingencyTotalC = computed(() =>
+      sumCents(toCents(cost.value.other.managementFee), contingencyCostC.value))
+
+    // ---------- 兼容模板的展示值（万元） ----------
+    const softwarePurchaseTotal = computed(() => fromCents(softwarePurchaseTotalC.value))
+    const devCost = computed(() => fromCents(devCostC.value))
+    const dataTotal = computed(() => fromCents(dataTotalC.value))
+    const integrationCost = computed(() => fromCents(integrationCostC.value))
+    const standardCost = computed(() => fromCents(standardCostC.value))
+    const migrationCost = computed(() => fromCents(migrationCostC.value))
+    const constructionTotal = computed(() => fromCents(constructionTotalC.value))
+    const productServiceCost = computed(() => fromCents(productServiceCostC.value))
+    const systemServiceCost = computed(() => fromCents(systemServiceCostC.value))
+    const purchaseServiceTotal = computed(() => fromCents(purchaseServiceTotalC.value))
+    const opsCost = computed(() => fromCents(opsCostC.value))
+    const contingencyCost = computed(() => fromCents(contingencyCostC.value))
+    const totalInvestment = computed(() => fromCents(totalInvestmentC.value))
+    const otherAndContingencyTotal = computed(() => fromCents(otherAndContingencyTotalC.value))
 
     const phaseLabelMap = {
       feasibility: '可研/估算',
@@ -912,7 +964,8 @@ export default {
       budget: '预算/招投标',
       settlement: '结算/审计'
     }
-    project.value.phaseLabel = phaseLabelMap[project.value.phase] || ''
+    // 必须是 computed：原先写成一次性赋值，导致切换阶段后标签与导出 CSV 永远停留在初始阶段
+    const phaseLabel = computed(() => phaseLabelMap[project.value.phase] || '')
 
     // ---------- 方法 ----------
     function loadExample() {
@@ -1020,7 +1073,7 @@ export default {
       const rows = [
         ['===== 项目信息 =====', ''],
         ['项目名称', project.value.name],
-        ['测算阶段', project.value.phaseLabel || project.value.phase],
+        ['测算阶段', phaseLabel.value || project.value.phase],
         [''],
         ['===== 建设费用 =====', ''],
         ['--- 成品软件购置 ---', ''],
@@ -1087,9 +1140,9 @@ export default {
         ['折现率 c (%)', cost.value.service.system.discount],
         ['使用期限 N (年)', cost.value.service.system.term],
         ['信息系统服务年均费 (万元)', systemServiceCost.value.toFixed(2)],
-        [''],
+        [],
         ['购买服务费合计 (万元)', purchaseServiceTotal.value.toFixed(2)],
-        [''],
+        [],
         ['===== 运维费用 =====', ''],
         ['--- IT 资产系数法 ---', ''],
         ['机房建设费用 (万元)', cost.value.ops.infrastructure.room],
@@ -1099,30 +1152,29 @@ export default {
         ['综合运维费率 (%)', cost.value.ops.rate],
         ['规模调整系数', cost.value.ops.scaleFactor],
         ['运维年费 (万元)', opsCost.value.toFixed(2)],
-        [''],
+        [],
         ['===== 其他费用 & 预备费 =====', ''],
         ['项目建设其他费用 (万元)', cost.value.other.managementFee],
         ['预备费费率 (%)', cost.value.other.contRate],
         ['预备费 (万元)', contingencyCost.value.toFixed(2)],
-        [''],
+        [],
         ['===== 项目总投资 =====', ''],
         ['项目总投资 (万元)', totalInvestment.value.toFixed(2)],
       ]
 
-      let csv = '\uFEFF' // BOM for Excel
-      rows.forEach(row => {
-        csv += row.join(',') + '\n'
-      })
+      // 统一走 buildCsv：转义逗号/引号/换行，并阻断 = + - @ 开头的公式注入（CWE-1236）
+      const csv = buildCsv(rows)
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
       const url = URL.createObjectURL(blob)
       link.href = url
-      link.setAttribute('download', `费用测算表_${project.value.name || '项目'}.csv`)
+      link.setAttribute('download', `费用测算表_${safeFileName(project.value.name, '项目')}.csv`)
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      // 立即 revoke 会导致部分浏览器中断下载，延迟释放
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
     }
 
     // ---------- 导出 PDF ----------
@@ -1224,6 +1276,7 @@ export default {
       exportRef,
       project,
       cost,
+      phaseLabel,
       softwarePurchaseTotal,
       devUFP,
       devUFPFormula,
@@ -1243,6 +1296,7 @@ export default {
       opsCost,
       contingencyCost,
       totalInvestment,
+      otherAndContingencyTotal,
       loadExample,
       resetAll,
       exportCSV,

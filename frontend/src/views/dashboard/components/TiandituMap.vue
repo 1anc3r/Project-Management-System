@@ -103,6 +103,9 @@ import { Loading, Warning, MapLocation, ArrowRight } from '@element-plus/icons-v
 import { getCityDistribution } from '@/api/projects';
 import { getPartnerLocations } from '@/api/partners';
 import { formatAmount, getProjectStageColor, getProjectStageTag } from '@/utils/format';
+// Leaflet 的 bindPopup / bindTooltip / divIcon 内部均为 innerHTML 赋值，
+// 等价于 v-html，因此所有拼接进 HTML 字符串的动态文本都必须转义
+import { escapeHtml } from '@/utils/sanitize';
 
 // ===================== Props =====================
 const props = defineProps({
@@ -284,9 +287,9 @@ function renderPartnerMarkers() {
       const marker = L.marker([lat, lng], { icon: customIcon })
         .bindPopup(`
           <div style="min-width:200px;">
-            <h4 style="margin:0 0 8px 0;color:#303133;">${location.name || '合作方'}</h4>
+            <h4 style="margin:0 0 8px 0;color:#303133;">${escapeHtml(location.name) || '合作方'}</h4>
             <p style="margin:4px 0;color:#606266;font-size:13px;">
-              <b>地址：</b>${location.address || '暂无地址'}
+              <b>地址：</b>${escapeHtml(location.address) || '暂无地址'}
             </p>
           </div>
         `, {
@@ -478,7 +481,7 @@ function createTooltipContent(cityName, cityData) {
 
   if (count === 0) {
     return `<div class="tooltip-content">
-      <div class="tooltip-title">${cityName}</div>
+      <div class="tooltip-title">${escapeHtml(cityName)}</div>
       <div class="tooltip-empty">暂无项目</div>
     </div>`;
   }
@@ -486,16 +489,17 @@ function createTooltipContent(cityName, cityData) {
   let stagesHtml = '';
   if (cityData.stageDistribution && Object.keys(cityData.stageDistribution).length > 0) {
     stagesHtml = '<div class="tooltip-stages">';
-    for (const [stage, count] of Object.entries(cityData.stageDistribution)) {
-      stagesHtml += `<span class="stage-tag" style="background:${STAGE_COLORS[stage] || '#909399'}">${stage}: ${count}</span>`;
+    for (const [stage, stageCount] of Object.entries(cityData.stageDistribution)) {
+      // STAGE_COLORS 为内部常量表，仍走转义以防键名被污染
+      stagesHtml += `<span class="stage-tag" style="background:${escapeHtml(STAGE_COLORS[stage] || '#909399')}">${escapeHtml(stage)}: ${escapeHtml(stageCount)}</span>`;
     }
     stagesHtml += '</div>';
   }
 
   return `<div class="tooltip-content">
-    <div class="tooltip-title">${cityName}</div>
-    <div class="tooltip-row"><span>项目数:</span> <b>${count} 个</b></div>
-    <div class="tooltip-row"><span>合同金额:</span> <b>${formatAmount(amount)} 万</b></div>
+    <div class="tooltip-title">${escapeHtml(cityName)}</div>
+    <div class="tooltip-row"><span>项目数:</span> <b>${escapeHtml(count)} 个</b></div>
+    <div class="tooltip-row"><span>合同金额:</span> <b>${escapeHtml(formatAmount(amount))} 万</b></div>
     ${stagesHtml}
     <div class="tooltip-hint">点击查看详情</div>
   </div>`;

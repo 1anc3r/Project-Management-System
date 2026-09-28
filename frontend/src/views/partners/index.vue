@@ -181,7 +181,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'Partners' })
+import { ref, reactive, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -342,39 +344,64 @@ const handleView = (row) => {
   detailDialogVisible.value = true
 }
 
+// 删除后收敛分页，避免删空最后一页后停留在空白页
+const fetchAfterDelete = () => {
+  const pageCount = Math.max(1, Math.ceil((pagination.total - 1) / pagination.pageSize))
+  if (pagination.page > pageCount) pagination.page = pageCount
+  return fetchData()
+}
+
 // 删除
-const handleDelete = (row) => {
-  if (canEdit(row)) {
-    ElMessageBox.confirm(`确定要删除合作方 "${row.name}" 吗？`, '提示', {
+const handleDelete = async (row) => {
+  if (!canEdit(row)) {
+    ElMessage.warning('您没有权限删除该合作方')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(`确定要删除合作方 "${row.name}" 吗？`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
-    }).then(async () => {
-      await deletePartner(row.id)
-      ElMessage.success('删除成功')
-      fetchData()
     })
-  } else {
-    ElMessage.warning('您没有权限删除此合作方')
+  } catch {
+    return   // 用户取消：静默返回，避免未捕获的 Promise 拒绝
+  }
+  try {
+    await deletePartner(row.id)
+    ElMessage.success('删除成功')
+    await fetchAfterDelete()
+  } catch (error) {
+    console.error('删除失败:', error)   // 错误提示已由 request.js 拦截器统一弹出
   }
 }
 
 // 批量删除
-const handleBatchDelete = () => {
+const handleBatchDelete = async () => {
   if (selectedRows.value.length === 0) return
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 个合作方吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(async () => {
-    for (const row of selectedRows.value) {
-      if (canEdit(row)) {
-        await deletePartner(row.id)
-      }
-    }
-    ElMessage.success('批量删除成功')
-    fetchData()
-  })
+  const targets = selectedRows.value.filter(canEdit)
+  const skipped = selectedRows.value.length - targets.length
+  if (targets.length === 0) {
+    ElMessage.warning('所选记录均无权限删除')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的 ${targets.length} 个合作方吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+  } catch {
+    return   // 用户取消：静默返回
+  }
+  const results = await Promise.allSettled(targets.map((r) => deletePartner(r.id)))
+  const ok = results.filter((r) => r.status === 'fulfilled').length
+  if (ok === results.length) {
+    ElMessage.success(`批量删除成功（${ok} 条）`)
+  } else {
+    ElMessage.warning(`删除完成：成功 ${ok} 条，失败 ${results.length - ok} 条`)
+  }
+  if (skipped > 0) ElMessage.warning(`已跳过 ${skipped} 条无权限记录`)
+  await fetchAfterDelete()
 }
 
 // 导出命令处理
@@ -430,6 +457,11 @@ const handleCardCommand = (command, row) => {
 onMounted(() => {
   // 先加载筛选选项
   fetchFilterOptions()
+  fetchData()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新数据
+onActivated(() => {
   fetchData()
 })
 </script>

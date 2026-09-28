@@ -84,18 +84,18 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="合同总金额" prop="total_amount">
-              <el-input-number v-model="form.total_amount" :precision="2" :min="0" style="width: 100%"
+              <el-input-number v-model="form.total_amount" value-on-clear="min" :precision="2" :min="0" style="width: 100%"
                 @change="calculateAmounts" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="已开票金额" prop="receipt_amount">
-              <el-input-number v-model="form.receipt_amount" :precision="2" :disabled=true style="width: 100%" />
+              <el-input-number v-model="form.receipt_amount" value-on-clear="min" :precision="2" :disabled=true style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="待开票金额">
-              <el-input-number v-model="form.pending_amount" :precision="2" :disabled=true style="width: 100%" />
+              <el-input-number v-model="form.pending_amount" value-on-clear="min" :precision="2" :disabled=true style="width: 100%" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -103,13 +103,13 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="成本" prop="cost">
-              <el-input-number v-model="form.cost" :precision="2" :min="0" style="width: 100%"
+              <el-input-number v-model="form.cost" value-on-clear="min" :precision="2" :min="0" style="width: 100%"
                 @change="calculateAmounts" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="毛利">
-              <el-input-number v-model="form.profit" :precision="2" :disabled=true style="width: 100%" />
+              <el-input-number v-model="form.profit" value-on-clear="min" :precision="2" :disabled=true style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -154,19 +154,19 @@
           </el-table-column>
           <el-table-column label="支付比例(%)" width="110">
             <template #default="{ row, $index }">
-              <el-input-number v-model="row.payment_ratio" :precision="2" :min="0" :max="100" size="small"
+              <el-input-number v-model="row.payment_ratio" value-on-clear="min" :precision="2" :min="0" :max="100" size="small"
                 style="width: 100%" @change="calculateAmounts()" />
             </template>
           </el-table-column>
           <el-table-column label="款项金额(万元)" width="120">
             <template #default="{ row, $index }">
-              <el-input-number v-model="row.payment_amount" :precision="2" :min="0" size="small" style="width: 100%"
+              <el-input-number v-model="row.payment_amount" value-on-clear="min" :precision="2" :min="0" size="small" style="width: 100%"
                 :disabled=true />
             </template>
           </el-table-column>
           <el-table-column label="是否开票" width="80" align="center">
             <template #default="{ row, $index }">
-              <el-checkbox v-model="row.is_paid" :true-value="1" :false-label="0" @change="calculateAmounts()" />
+              <el-checkbox v-model="row.is_paid" :true-value="1" :false-value="0" @change="calculateAmounts()" />
             </template>
           </el-table-column>
           <el-table-column label="开票日期" width="140">
@@ -446,21 +446,22 @@ const paymentRatioWarning = computed(() => {
 
 // 计算金额（统一入口，避免重复计算）
 const calculateAmounts = () => {
-  form.value.receipt_amount = 0
+  const total = toNum(form.value.total_amount)
+  const cost = toNum(form.value.cost)
 
-  payments.value.forEach(payment => {
-    payment.payment_amount = parseFloat(((form.value.total_amount * toNum(payment.payment_ratio)) / 100).toFixed(2))
-    if (payment.is_paid) {
-      form.value.receipt_amount += payment.payment_amount
-    }
-  })
-  form.value.receipt_amount = parseFloat(form.value.receipt_amount.toFixed(2))
+  // 仅当存在款项明细时才依据比例重算已开票金额，避免覆盖历史/导入项目的既有数据
+  if (payments.value.length > 0) {
+    let received = 0
+    payments.value.forEach((payment) => {
+      payment.payment_amount = parseFloat(((total * toNum(payment.payment_ratio)) / 100).toFixed(2))
+      if (Number(payment.is_paid) === 1) received += payment.payment_amount
+    })
+    form.value.receipt_amount = parseFloat(received.toFixed(2))
+  }
 
-  form.value.pending_amount = parseFloat((form.value.total_amount - form.value.receipt_amount).toFixed(2))
-  form.value.profit = parseFloat((form.value.total_amount - form.value.cost).toFixed(2))
-  form.value.profit_rate = form.value.total_amount > 0
-    ? parseFloat(((form.value.profit / form.value.total_amount) * 100).toFixed(2))
-    : 0
+  form.value.pending_amount = parseFloat((total - toNum(form.value.receipt_amount)).toFixed(2))
+  form.value.profit = parseFloat((total - cost).toFixed(2))
+  form.value.profit_rate = total > 0 ? parseFloat(((form.value.profit / total) * 100).toFixed(2)) : 0
 }
 
 // 搜索合作方（增加空值保护）
@@ -504,7 +505,7 @@ const handleAddPayment = () => {
     payment_condition: '',
     payment_ratio: 0,
     payment_amount: 0,
-    is_paid: false,
+    is_paid: 0,
     payment_date: ''
   })
 }

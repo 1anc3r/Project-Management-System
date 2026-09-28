@@ -39,11 +39,12 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
@@ -66,18 +67,34 @@ const loginRules = {
 }
 
 const handleLogin = async () => {
+  if (loading.value) return // 防重：回车与按钮可能同时触发
+
+  // 校验失败会 reject，需与登录失败区分，避免把校验错误当异常吞掉
   try {
     await loginFormRef.value.validate()
-    loading.value = true
+  } catch {
+    return
+  }
 
+  loading.value = true
+  try {
     await userStore.loginAction({
       username: loginForm.username,
       password: loginForm.password
     })
 
     ElMessage.success('登录成功')
-    router.push('/')
+
+    // 会话过期时由 request.js 写入 redirect，登录后回跳原页面以保留深链
+    // 仅接受站内绝对路径，且排除 // 开头的协议相对地址，防止开放重定向
+    const redirect = route.query.redirect
+    const target = typeof redirect === 'string' &&
+      redirect.startsWith('/') && !redirect.startsWith('//')
+      ? redirect
+      : '/'
+    router.replace(target)
   } catch (error) {
+    // 错误提示已由 request.js 响应拦截器统一弹出，此处仅记录
     console.error('登录失败:', error)
   } finally {
     loading.value = false

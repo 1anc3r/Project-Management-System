@@ -188,7 +188,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'Knowledge' })
+import { ref, reactive, onMounted, onActivated, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Plus, Search, List, Grid, Download, Upload, Edit,
@@ -514,6 +516,11 @@ const handleCardCommand = (command, row) => {
 
 onMounted(() => {
   fetchFilterOptions()
+  fetchData()
+})
+
+// 页面被 keep-alive 缓存后，再次激活不会触发 onMounted，需在此刷新数据
+onActivated(() => {
   fetchData()
 })
 </script>

@@ -13,6 +13,7 @@ require('dotenv').config();
 
 const { testConnection } = require('./config/db');
 const { authenticate, checkStaticFileAccess } = require('./middleware/auth');
+const { checkDefaultAdminPassword } = require('./config/security');
 
 // 导入路由
 const authRoutes = require('./routes/auth');
@@ -121,6 +122,9 @@ const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
+    // 安全配置检查（弱口令/密钥复用告警，生产环境不合规时此处已抛错）
+    checkDefaultAdminPassword();
+
     // 测试数据库连接
     const dbConnected = await testConnection();
     if (!dbConnected) {

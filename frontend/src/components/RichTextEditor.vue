@@ -13,6 +13,7 @@ import { ElMessage } from 'element-plus'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { uploadImage } from '@/api/attachments'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const props = defineProps({
   modelValue: {
@@ -83,16 +84,27 @@ const editorOptions = ref({
 })
 
 // 监听外部值变化
+// 关键：vue-quill 的 contentType="html" 走 setHTML()，其实现是 quill.root.innerHTML = html，
+// 属危险赋值。外部传入的 HTML（可能来自后端导入数据）必须先净化再进入编辑器。
+// 说明：仅当外部值确实变化时才写回，避免父组件回传自身 emit 触发无谓重建（会重置光标）。
 watch(() => props.modelValue, (newVal) => {
-  if (newVal !== content.value) {
-    content.value = newVal
+  if (newVal === content.value) return
+  const safe = sanitizeHtml(newVal)
+  if (safe !== content.value) {
+    content.value = safe
   }
 })
 
 // 监听内部值变化
+// 出口同样净化，避免编辑器内容（含粘贴引入的脏 HTML）回流父组件并最终落库
 watch(content, (newVal) => {
-  emit('update:modelValue', newVal)
-  emit('change', newVal)
+  const safe = sanitizeHtml(newVal)
+  // 净化未产生变化时不回写，避免打断编辑（Quill 无需重新设值）
+  if (safe !== newVal) {
+    content.value = safe
+  }
+  emit('update:modelValue', safe)
+  emit('change', safe)
 })
 
 /**

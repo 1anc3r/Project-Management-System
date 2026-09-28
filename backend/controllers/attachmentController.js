@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const { getDictItems, validateDictValue } = require('../utils/dictHelper');
 const { ATTACHMENT_TYPES, IMAGE_EXTENSIONS, PREVIEWABLE_EXTENSIONS, TEXT_MIME_TYPES } = require('../config/const');
+const { canAccessAttachment } = require('../utils/acl');
 
 /**
  * 判断文件是否为图片
@@ -63,10 +64,29 @@ const issueAccessTokens = async (req, res) => {
 
     const tokens = {};
 
-    for (const id of ids) {
-      const numId = parseInt(id);
-      if (!Number.isInteger(numId) || numId <= 0) continue;
-      tokens[`id:${numId}`] = generateFileAccessToken({ kind: 'id', id: numId });
+    // 按 id 签发：必须先校验附件归属，否则任意登录用户可枚举 id 越权获取他人文件
+    if (ids.length > 0) {
+      const numIds = ids
+        .map((id) => parseInt(id, 10))
+        .filter((numId) => Number.isInteger(numId) && numId > 0);
+
+      if (numIds.length > 0) {
+        const placeholders = numIds.map(() => '?').join(',');
+        const rows = await query(
+          `SELECT id, project_id, knowledge_id, opportunity_id
+             FROM attachments
+            WHERE id IN (${placeholders})`,
+          numIds
+        );
+
+        for (const row of rows) {
+          // 无权限的附件静默跳过，不泄露其是否存在
+          // eslint-disable-next-line no-await-in-loop
+          if (await canAccessAttachment(req.user, row)) {
+            tokens[`id:${row.id}`] = generateFileAccessToken({ kind: 'id', id: row.id });
+          }
+        }
+      }
     }
 
     for (const file of files) {
@@ -74,6 +94,27 @@ const issueAccessTokens = async (req, res) => {
       // 仅取文件名部分，防止路径穿越
       const safeName = path.basename(file);
       if (!safeName || safeName !== file.replace(/^\/uploads\//, '')) continue;
+
+      // 文件名可被猜测，因此同样需按附件记录校验归属，否则等于开放的静态文件读取
+      const attRows = await query(
+        `SELECT id, project_id, knowledge_id, opportunity_id
+           FROM attachments
+          WHERE file_path = ?`,
+        [safeName]
+      );
+
+      let allowed = false;
+      for (const row of attRows) {
+        // eslint-disable-next-line no-await-in-loop
+        if (await canAccessAttachment(req.user, row)) {
+          allowed = true;
+          break;
+        }
+      }
+
+      // 无对应记录或无权限：不签发（fail-closed）
+      if (!allowed) continue;
+
       tokens[`file:${safeName}`] = generateFileAccessToken({ kind: 'file', file: safeName });
     }
 

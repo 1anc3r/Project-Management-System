@@ -169,8 +169,13 @@
       <!-- 主体内容 -->
       <el-main class="main-content">
         <router-view v-slot="{ Component, route }">
-          <keep-alive :include="tabStore.cachedViews">
-            <component :is="Component" :key="route.fullPath" />
+          <!--
+            缓存键使用 route.path（与 stores/tabs.js 的按 path 去重口径一致），
+            避免同一路由不同 query 生成多个实例；:max 防止实例无界增长。
+            include 依赖各 view 组件显式声明的 name（必须与 route.name 一致）。
+          -->
+          <keep-alive :include="tabStore.cachedViews" :max="12">
+            <component :is="Component" :key="route.path" />
           </keep-alive>
         </router-view>
       </el-main>
@@ -207,7 +212,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Tools, UserFilled } from '@element-plus/icons-vue'
@@ -280,8 +285,9 @@ const handleTabClick = (tab) => {
 
 // 关闭标签页
 const handleCloseTab = (tab) => {
-  tabStore.removeView(tab.path)
-  router.push(tabStore.activeTab)
+  // 用返回的相邻标签的 fullPath 跳转，避免丢失 query（activeTab 只存 path）
+  const nextView = tabStore.removeView(tab.path)
+  router.push(nextView?.fullPath || '/dashboard')
 }
 
 // 标签页下拉菜单
@@ -321,11 +327,24 @@ onUnmounted(() => {
   document.removeEventListener('click', hideContextMenu)
 })
 
-const handleRefresh = () => {
+// 刷新当前标签：先摘出缓存触发卸载，再放回以重建组件，从而真正重新加载数据
+const handleRefresh = async () => {
   hideContextMenu()
-  router.replace({
-    path: currentTab.value.fullPath
-  })
+  const tab = currentTab.value
+  if (!tab) return
+
+  const cacheIndex = tabStore.cachedViews.indexOf(tab.name)
+  if (cacheIndex > -1) tabStore.cachedViews.splice(cacheIndex, 1)
+  await nextTick()
+  if (tab.name && !tabStore.cachedViews.includes(tab.name)) {
+    tabStore.cachedViews.push(tab.name)
+  }
+  await nextTick()
+
+  // 若目标不是当前路由，再用 fullPath 跳转（保留 query）
+  if (route.fullPath !== tab.fullPath) {
+    router.replace(tab.fullPath)
+  }
 }
 
 const handleCloseCurrent = () => {
@@ -354,9 +373,11 @@ const handleCommand = (command) => {
       type: 'warning'
     }).then(() => {
       userStore.logout()
+      // 复位标签页与组件缓存，避免换账号后残留上一用户的页面与缓存实例
+      tabStore.reset()
       router.push('/login')
       ElMessage.success('已退出登录')
-    })
+    }).catch(() => {})   // 用户取消：静默吞掉拒绝
   } else if (command === 'password') {
     passwordDialogVisible.value = true
     passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
@@ -394,13 +415,21 @@ const passwordRules = {
 }
 
 const handleChangePassword = async () => {
-  await passwordFormRef.value.validate()
-  await changePassword({
-    oldPassword: passwordForm.value.oldPassword,
-    newPassword: passwordForm.value.newPassword
-  })
-  ElMessage.success('密码修改成功')
-  passwordDialogVisible.value = false
+  try {
+    await passwordFormRef.value.validate()
+  } catch {
+    return   // 校验失败：表单已展示行内错误，静默返回
+  }
+  try {
+    await changePassword({
+      oldPassword: passwordForm.value.oldPassword,
+      newPassword: passwordForm.value.newPassword
+    })
+    ElMessage.success('密码修改成功')
+    passwordDialogVisible.value = false
+  } catch (error) {
+    console.error('修改密码失败:', error)   // 错误提示已由 request.js 拦截器统一弹出
+  }
 }
 </script>
 

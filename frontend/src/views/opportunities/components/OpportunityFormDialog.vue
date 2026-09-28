@@ -56,7 +56,7 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="预计金额" prop="estimated_amount">
-              <el-input-number v-model="form.estimated_amount" :precision="2" :min="0" style="width: 100%" />
+              <el-input-number v-model="form.estimated_amount" value-on-clear="min" :precision="2" :min="0" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">

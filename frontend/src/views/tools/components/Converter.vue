@@ -161,6 +161,8 @@
 </template>
 
 <script setup>
+// 必须与 router 中的 route.name 一致，否则 <keep-alive :include> 无法命中（标签页缓存失效）
+defineOptions({ name: 'Converter' })
 import { ref, watch } from 'vue';
 
 // =============================================================

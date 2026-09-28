@@ -105,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   Picture, Document, Download, FullScreen, Close
@@ -192,9 +192,12 @@ const fetchTextContent = async () => {
 // 获取图片/PDF 文件 Blob 并生成对象 URL
 const fetchPreviewBlob = async () => {
   if (!props.attachment?.id) return
+  const targetId = props.attachment.id
   loading.value = true
   try {
-    const response = await getFileViewBlob(props.attachment.id)
+    const response = await getFileViewBlob(targetId)
+    // 请求期间已切换到其它附件：丢弃过期响应，避免展示错文件
+    if (targetId !== props.attachment?.id) return
 
     if (previewType.value === 'image' || previewType.value === 'pdf') {
       // 图片/PDF 走 blob URL
@@ -204,10 +207,11 @@ const fetchPreviewBlob = async () => {
       previewData.value = response.data
     }
   } catch (error) {
+    if (targetId !== props.attachment?.id) return
     console.error('获取文件预览失败:', error)
     ElMessage.error('获取文件预览失败')
   } finally {
-    loading.value = false
+    if (targetId === props.attachment?.id) loading.value = false
   }
 }
 
@@ -253,6 +257,10 @@ const handleClose = () => {
 const loadPreview = () => {
   if (!props.attachment) return
 
+  // 切换附件时先释放上一个 ObjectURL 并清空残留内容，避免内存泄漏与跨文件脏数据
+  revokePreviewUrl()
+  textContent.value = ''
+  officePreviewUrl.value = ''
   fileSize.value = props.attachment.file_size || 0
 
   if (previewType.value === 'text') {
@@ -266,8 +274,14 @@ const loadPreview = () => {
   }
 }
 
-// 监听对话框显示
-watch(() => props.modelValue, (val) => {
+// 兜底：父级弹窗使用 destroy-on-close 直接卸载本组件时不会触发 handleClose，
+// 必须在卸载钩子中释放 ObjectURL，否则 blob 会常驻直到刷新页面（单文件上限 100MB）
+onUnmounted(() => {
+  revokePreviewUrl()
+})
+
+// 监听对话框显示，以及弹窗保持打开时切换附件的情况（需重新加载并释放旧资源）
+watch(() => [props.modelValue, props.attachment?.id], ([val]) => {
   if (val) {
     loadPreview()
   }
