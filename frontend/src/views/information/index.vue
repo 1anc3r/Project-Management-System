@@ -117,7 +117,7 @@
                 <template #title>
                   <div class="collapse-header">
                     <span class="collapse-title">全部资讯</span>
-                    <el-tag type="info" size="small" class="count-tag">{{ informationList.length }} 条</el-tag>
+                    <el-tag type="info" size="small" class="count-tag">{{ pagination.total }} 条</el-tag>
                   </div>
                 </template>
                 <el-timeline v-if="informationList.length">
